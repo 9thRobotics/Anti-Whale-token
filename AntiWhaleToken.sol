@@ -14,6 +14,9 @@ contract AntiWhaleToken {
     uint256 public maxTransactionAmount = 1000 * 10**uint256(decimals);
 
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event MaxTransactionAmountSet(uint256 amount);
+    event ExcludedFromLimits(address indexed account, bool excluded);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not the owner");
@@ -47,9 +50,17 @@ contract AntiWhaleToken {
 
     function setMaxTransactionAmount(uint256 _amount) external onlyOwner {
         maxTransactionAmount = _amount;
+        emit MaxTransactionAmountSet(_amount);
     }
 
     function excludeFromLimits(address account, bool excluded) external onlyOwner {
         isExcludedFromLimits[account] = excluded;
+        emit ExcludedFromLimits(account, excluded);
+    }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "New owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
     }
 }
